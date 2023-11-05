@@ -10,7 +10,8 @@
     "dev": "npx esbuild index.js --bundle --outdir=dist --watch",
     "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js",
     "serve": "npx srvd --debug",
-    "setup": "cd test-data && ./setup.sh"
+    "setup": "cd test-data && ./setup.sh",
+    "test": "echo 'no automated tests'"
   },
   "repository": {
     "type": "git",
