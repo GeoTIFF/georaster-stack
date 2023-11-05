@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Read GeoSpatial Raster Data",
   "main": "./index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "dev": "npx esbuild index.js --bundle --outdir=dist --watch",
     "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js",
