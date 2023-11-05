@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://unpkg.com/flug"></script>
+    <script src="http://unpkg.com/geo-extent"></script>
+    <script src="https://unpkg.com/georaster"></script>
+    <script src="./dist/index.js"></script>
+  </head>
+  <body>
+    <script>
+
+      window.process = {
+        env: {
+          TEST_NAME: "diff projections + ab"
+        }
+      }
+
+      function three_to_four_bands({ tile, height, width }) {
+        const data = new Array(4 * height * width).fill(255);
+        for (let b = 0; b <= 2; b++) {
+          for (let r = 0; r < height; r++) {
+            for (let c = 0; c < width; c++) {
+              data[(r * 4 * width) + (4 * c) + b] = tile[b][r][c];
+            }
+          }
+        }
+        return data;
+      }
+
+      function displayTile({ tile, height, width }) {
+        const data = Uint8ClampedArray.from(tile);
+        const imageData = new ImageData(data, width, height);
+        const canvas = document.createElement("CANVAS");
+        canvas.height = imageData.height;
+        canvas.width = imageData.width;
+        const context = canvas.getContext("2d");
+        context.webkitImageSmoothingEnabled = false;
+        context.mozImageSmoothingEnabled = false;
+        context.imageSmoothingEnabled = false;
+        context.putImageData(imageData, 0, 0);
+        context.webkitImageSmoothingEnabled = false;
+        context.mozImageSmoothingEnabled = false;
+        context.imageSmoothingEnabled = false;
+        document.body.appendChild(canvas);
+        canvas.style.background = "darkred";
+        canvas.style.border = "5px solid chartreuse";
+        canvas.style.margin = "10px";
+        canvas.style.height = "512px";
+      }
+
+      test("basic", async ({ eq }) => {
+        const georaster = await parseGeoraster(window.location.href + "test-data/wildfires.tiff");
+
+        const tiler = new GeoRasterReader({
+          sources: [georaster]
+        });
+        
+        const height = 512;
+        const width = 512;
+
+        const tile = await tiler.read({
+          extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
+          size: [width, height]
+        });
+
+        const data = three_to_four_bands({ height, width, tile })
+
+        displayTile({ tile: data, height, width});
+      });
+
+      test("multiple", async ({ eq }) => {
+        const red = await parseGeoraster(window.location.href + "test-data/wildfires_red.tiff");
+        const green = await parseGeoraster(window.location.href + "test-data/wildfires_green.tiff");
+        const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
+
+        const tiler = new GeoRasterReader({
+          sources: [green, blue, red]
+        });
+        
+        const height = 512;
+        const width = 512;
+
+        const tile = await tiler.read({
+          extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
+          size: [width, height]
+        });
+
+        const data = three_to_four_bands({ height, width, tile })
+
+        displayTile({ tile: data, height, width});
+      });
+
+      test("diff projections", async ({ eq }) => {
+        const red = await parseGeoraster(window.location.href + "test-data/wildfires_red_32610.tiff");
+        const green = await parseGeoraster(window.location.href + "test-data/wildfires_green_3857.tiff");
+        const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
+
+        const tiler = new GeoRasterReader({
+          sources: [blue, green, red]
+        });
+        
+        const height = 512;
+        const width = 512;
+
+        const tile = await tiler.read({
+          extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
+          size: [width, height]
+        });
+
+        const data = three_to_four_bands({ height, width, tile })
+
+        displayTile({ tile: data, height, width});
+      });
+
+      test("diff projections + ab", async ({ eq }) => {
+        const red_ab = await fetch(window.location.href + "test-data/wildfires_red_32610.tiff").then(res => res.arrayBuffer());
+        const red = await parseGeoraster(red_ab);
+        const green = await parseGeoraster(window.location.href + "test-data/wildfires_green_3857.tiff");
+        const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
+
+        const tiler = new GeoRasterReader({
+          sources: [blue, green, red]
+        });
+        
+        const height = 512;
+        const width = 512;
+
+        const tile = await tiler.read({
+          extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
+          size: [width, height]
+        });
+
+        const data = three_to_four_bands({ height, width, tile })
+
+        displayTile({ tile: data, height, width});
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "georaster-reader",
+  "version": "0.0.0",
+  "description": "Read GeoSpatial Raster Data",
+  "main": "./index.js",
+  "scripts": {
+    "dev": "npx esbuild index.js --bundle --outdir=dist --watch",
+    "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js",
+    "serve": "npx srvd --debug",
+    "setup": "cd test-data && ./setup.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeoTIFF/georaster-reader.git"
+  },
+  "author": "Daniel J. Dufour",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/GeoTIFF/georaster-reader/issues"
+  },
+  "homepage": "https://github.com/GeoTIFF/georaster-reader#readme",
+  "dependencies": {
+    "geotiff-tile": "^0.16.1",
+    "geotiff-tile-web-worker": "^0.5.0",
+    "proj4-fully-loaded": "^0.2.0"
+  }
+}
