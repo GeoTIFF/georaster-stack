@@ -1,5 +1,5 @@
 # georaster-reader
-> Read GeoSpatial Raster Data
+> Read Stack of GeoSpatial Rasters
 
 ### features
 - Reprojection and Resampling
