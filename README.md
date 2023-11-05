@@ -19,7 +19,7 @@ npm install georaster-reader
 ### basic usage
 ```js
 import { GeoExtent } from "geo-extent";
-import { GeoRasterReader } from "georaster-webtiler";
+import { GeoRasterReader } from "georaster-reader";
 
 import parseGeoRaster from "georaster";
 
@@ -37,7 +37,6 @@ reader.read({
 
 ### advanced usage
 ```js
-
 const reader = new GeoRasterReader({
   // multiple sources
   // they can even be in different projections!
