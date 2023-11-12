@@ -133,3 +133,4 @@ dist
 pnpm-lock.yaml
 test-data/*cog*
 test-data/*tif*
+*bak*
