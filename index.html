@@ -8,19 +8,20 @@
   </head>
   <body>
     <script>
-
       window.process = {
         env: {
-          TEST_NAME: "diff projections + ab"
+          // TEST_NAME: "diff projections + ab"
+          // TEST_NAME: "landsat stack",
+          TEST_TIMED: true
         }
-      }
+      };
 
       function three_to_four_bands({ tile, height, width }) {
         const data = new Array(4 * height * width).fill(255);
         for (let b = 0; b <= 2; b++) {
           for (let r = 0; r < height; r++) {
             for (let c = 0; c < width; c++) {
-              data[(r * 4 * width) + (4 * c) + b] = tile[b][r][c];
+              data[r * 4 * width + 4 * c + b] = tile[b][r][c];
             }
           }
         }
@@ -48,24 +49,28 @@
         canvas.style.height = "512px";
       }
 
+      function display_three_band({ data, height, width }) {
+        const rgba = three_to_four_bands({ height, width, tile: data });
+        displayTile({ tile: rgba, height, width });
+      }
+
       test("basic", async ({ eq }) => {
         const georaster = await parseGeoraster(window.location.href + "test-data/wildfires.tiff");
 
-        const tiler = new GeoRasterReader({
+        const reader = new GeoRasterReader({
+          flat: true,
           sources: [georaster]
         });
-        
+
         const height = 512;
         const width = 512;
 
-        const tile = await tiler.read({
+        const { data: tile } = await reader.read({
           extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
           size: [width, height]
         });
 
-        const data = three_to_four_bands({ height, width, tile })
-
-        displayTile({ tile: data, height, width});
+        display_three_band({ height, width, data: tile });
       });
 
       test("multiple", async ({ eq }) => {
@@ -74,20 +79,19 @@
         const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
 
         const tiler = new GeoRasterReader({
+          flat: true,
           sources: [green, blue, red]
         });
-        
+
         const height = 512;
         const width = 512;
 
-        const tile = await tiler.read({
+        const { data: tile } = await tiler.read({
           extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
           size: [width, height]
         });
 
-        const data = three_to_four_bands({ height, width, tile })
-
-        displayTile({ tile: data, height, width});
+        display_three_band({ height, width, data: tile });
       });
 
       test("diff projections", async ({ eq }) => {
@@ -96,20 +100,19 @@
         const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
 
         const tiler = new GeoRasterReader({
+          flat: true,
           sources: [blue, green, red]
         });
-        
+
         const height = 512;
         const width = 512;
 
-        const tile = await tiler.read({
+        const { data: tile } = await tiler.read({
           extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
           size: [width, height]
         });
 
-        const data = three_to_four_bands({ height, width, tile })
-
-        displayTile({ tile: data, height, width});
+        display_three_band({ height, width, data: tile });
       });
 
       test("diff projections + ab", async ({ eq }) => {
@@ -119,20 +122,105 @@
         const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
 
         const tiler = new GeoRasterReader({
+          flat: true,
           sources: [blue, green, red]
         });
-        
+
         const height = 512;
         const width = 512;
 
-        const tile = await tiler.read({
+        const { data: tile } = await tiler.read({
           extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
           size: [width, height]
         });
 
-        const data = three_to_four_bands({ height, width, tile })
+        display_three_band({ height, width, data: tile });
+      });
 
-        displayTile({ tile: data, height, width});
+      test("landsat stack", async ({ eq }) => {
+        const urls = [
+          "http://localhost:8080/test-data/LC08_L1TP_045032_20180811_20180815_01_T1_B5.TIF",
+          "http://localhost:8080/test-data/LC08_L1TP_045032_20180811_20180815_01_T1_B7.TIF",
+          "http://localhost:8080/test-data/LC08_L1TP_045032_20180811_20180815_01_T1_B5.TIF" // repeat of first
+        ];
+
+        const reader = new GeoRasterReader({
+          debugLevel: 0,
+          flat: true,
+          sources: await Promise.all(urls.map(url => parseGeoraster(url)))
+        });
+
+        const height = 512;
+        const width = 512;
+
+        const result = await reader.read({
+          extent: new GeoExtent([1000, 2000, 6000, 7000], { srs: "simple" }),
+          size: [width, height]
+        });
+
+        console.log("result:", result);
+
+        const scaled_data = result.data.map(band => band.map(row => row.map(n => Math.round((n / 65535) * 255))));
+
+        console.log("scaled_data:", scaled_data);
+
+        display_three_band({ height, width, data: scaled_data });
+      });
+
+      test("simple low-res", async ({ eq }) => {
+        const georaster = await parseGeoraster(window.location.href + "test-data/vestfold.tif");
+        console.log("georaster:", georaster);
+
+        const reader = new GeoRasterReader({
+          debugLevel: 0,
+          flat: true,
+          sources: [georaster]
+        });
+
+        const params = {
+          extent: new GeoExtent([128, 656, 144, 672], { srs: "simple" }),
+          size: [256, 256]
+        };
+
+        window.rerun = async () => await reader.read(params);
+
+        const result = await reader.read(params);
+        console.log("result:", result);
+
+        const {
+          data,
+          size: [width, height]
+        } = result;
+
+        display_three_band({ height, width, data: [data[0], data[0], data[0]] });
+      });
+
+      test("simple high-res", async ({ eq }) => {
+        const georaster = await parseGeoraster(window.location.href + "test-data/vestfold.tif");
+        console.log("georaster:", georaster);
+
+        const reader = new GeoRasterReader({
+          debugLevel: 0,
+          flat: true,
+          sources: [georaster]
+        });
+
+        const params = {
+          extent: new GeoExtent([128, 500, 328, 700], { srs: "simple" }),
+          size: [256, 256]
+        };
+
+        window.rerun = async () => await reader.read(params);
+
+        const result = await reader.read(params);
+        console.log("result:", result);
+
+        const {
+          data,
+          size: [width, height]
+        } = result;
+
+        display_three_band({ height, width, data: [data[0], data[0], data[0]] });
       });
     </script>
   </body>
