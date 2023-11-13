@@ -7,9 +7,11 @@
     "index.js"
   ],
   "scripts": {
-    "dev": "npx esbuild index.js --bundle --outdir=dist --watch",
-    "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js",
-    "serve": "npx srvd --debug",
+    "build+watch": "npx esbuild index.js --bundle --outdir=dist --watch",
+    "clean": "npx rimraf dist",
+    "dev": "npx concurrently \"npm run build+watch\" \"npm run serve\"",
+    "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js *.html",
+    "serve": "npx srvd --debug --wait=inf",
     "setup": "cd test-data && ./setup.sh",
     "test": "echo 'no automated tests'"
   },
@@ -24,8 +26,12 @@
   },
   "homepage": "https://github.com/GeoTIFF/georaster-reader#readme",
   "dependencies": {
-    "geotiff-tile": "^0.16.1",
-    "geotiff-tile-web-worker": "^0.5.0",
+    "geotiff-tile": "^0.18.2",
+    "geotiff-tile-web-worker": "^0.8.0",
     "proj4-fully-loaded": "^0.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
   }
 }
