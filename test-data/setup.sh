@@ -12,3 +12,6 @@ gdal_translate -b 3 wildfires.tiff wildfires_blue.tiff
 
 gdalwarp -t_srs EPSG:32610 wildfires_red.tiff wildfires_red_32610.tiff
 gdalwarp -t_srs EPSG:3857 wildfires_green.tiff wildfires_green_3857.tiff
+
+wget https://geoblaze.s3.amazonaws.com/LC08_L1TP_045032_20180811_20180815_01_T1_B5.TIF
+wget https://geoblaze.s3.amazonaws.com/LC08_L1TP_045032_20180811_20180815_01_T1_B7.TIF
