@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/GeoTIFF/georaster-reader#readme",
   "dependencies": {
-    "geotiff-tile": "^0.18.2",
-    "geotiff-tile-web-worker": "^0.8.0",
+    "geotiff-tile": "^0.18.3",
+    "geotiff-tile-web-worker": "^0.8.1",
     "proj4-fully-loaded": "^0.2.0"
   },
   "devDependencies": {
