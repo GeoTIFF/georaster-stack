@@ -4,10 +4,11 @@
   "description": "Read GeoSpatial Raster Data",
   "main": "./index.js",
   "files": [
-    "index.js"
+    "./index.js",
+    "./web/index.js"
   ],
   "scripts": {
-    "build+watch": "npx esbuild index.js --bundle --outdir=dist --watch",
+    "build+watch": "npx esbuild ./web/index.js --bundle --outdir=dist --watch",
     "clean": "npx rimraf dist",
     "dev": "npx concurrently \"npm run build+watch\" \"npm run serve\"",
     "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js *.html",

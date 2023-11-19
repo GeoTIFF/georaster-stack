@@ -20,7 +20,7 @@ npm install georaster-reader
 ### basic usage
 ```js
 import { GeoExtent } from "geo-extent";
-import { GeoRasterReader } from "georaster-reader";
+import { GeoRasterReader } from "georaster-reader/web";
 
 import parseGeoRaster from "georaster";
 
