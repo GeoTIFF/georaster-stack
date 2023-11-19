@@ -1,6 +1,6 @@
 {
   "name": "georaster-reader",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read GeoSpatial Raster Data",
   "main": "./index.js",
   "files": [
