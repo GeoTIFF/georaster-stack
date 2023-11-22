@@ -5,9 +5,13 @@
   "main": "./web/index.js",
   "files": [
     "core/index.js",
-    "web/index.js"
+    "web/index.js",
+    "dist/georaster-stack.min.js",
+    "dist/georaster-stack.min.js.map"
   ],
+  "unpkg": "./dist/georaster-stack.min.js",
   "scripts": {
+    "build": "npx esbuild ./web/index.js --bundle --outfile=./dist/georaster-stack.min.js --sourcemap",
     "build+watch": "npx esbuild ./web/index.js --bundle --outdir=dist --watch",
     "clean": "npx rimraf dist",
     "dev": "npx concurrently \"npm run build+watch\" \"npm run serve\"",
