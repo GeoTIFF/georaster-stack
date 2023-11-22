@@ -66,7 +66,7 @@ const stack = await GeoRasterStack.init({
   sources: [...],
 
   // optional properties
-  debug_level,
+  debug_level: 2,
   flat: true, // flatten all the georaster results when reading by one level, so they appear as if they came from the same source
   method: "near-vectorize", // resampling method via https://github.com/danieljdufour/geowarp
   turbo: true // apply experimential projection turbo charging via https://github.com/DanielJDufour/proj-turbo
