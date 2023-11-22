@@ -12,6 +12,7 @@
         env: {
           // TEST_NAME: "diff projections + ab"
           // TEST_NAME: "landsat stack",
+          // TEST_NAME: "umbra",
           TEST_TIMED: true
         }
       };
@@ -57,7 +58,7 @@
       test("basic", async ({ eq }) => {
         const georaster = await parseGeoraster(window.location.href + "test-data/wildfires.tiff");
 
-        const reader = new GeoRasterReader({
+        const reader = await GeoRasterStack.init({
           flat: true,
           sources: [georaster]
         });
@@ -78,7 +79,7 @@
         const green = await parseGeoraster(window.location.href + "test-data/wildfires_green.tiff");
         const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
 
-        const tiler = new GeoRasterReader({
+        const tiler = await GeoRasterStack.init({
           flat: true,
           sources: [green, blue, red]
         });
@@ -99,7 +100,7 @@
         const green = await parseGeoraster(window.location.href + "test-data/wildfires_green_3857.tiff");
         const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
 
-        const tiler = new GeoRasterReader({
+        const tiler = await GeoRasterStack.init({
           flat: true,
           sources: [blue, green, red]
         });
@@ -121,7 +122,7 @@
         const green = await parseGeoraster(window.location.href + "test-data/wildfires_green_3857.tiff");
         const blue = await parseGeoraster(window.location.href + "test-data/wildfires_blue.tiff");
 
-        const tiler = new GeoRasterReader({
+        const tiler = await GeoRasterStack.init({
           flat: true,
           sources: [blue, green, red]
         });
@@ -144,7 +145,7 @@
           "http://localhost:8080/test-data/LC08_L1TP_045032_20180811_20180815_01_T1_B5.TIF" // repeat of first
         ];
 
-        const reader = new GeoRasterReader({
+        const reader = await GeoRasterStack.init({
           debugLevel: 0,
           flat: true,
           sources: await Promise.all(urls.map(url => parseGeoraster(url)))
@@ -171,7 +172,7 @@
         const georaster = await parseGeoraster(window.location.href + "test-data/vestfold.tif");
         console.log("georaster:", georaster);
 
-        const reader = new GeoRasterReader({
+        const reader = await GeoRasterStack.init({
           debugLevel: 0,
           flat: true,
           sources: [georaster]
@@ -199,7 +200,7 @@
         const georaster = await parseGeoraster(window.location.href + "test-data/vestfold.tif");
         console.log("georaster:", georaster);
 
-        const reader = new GeoRasterReader({
+        const reader = await GeoRasterStack.init({
           debugLevel: 0,
           flat: true,
           sources: [georaster]
@@ -207,6 +208,34 @@
 
         const params = {
           extent: new GeoExtent([128, 500, 328, 700], { srs: "simple" }),
+          size: [256, 256]
+        };
+
+        window.rerun = async () => await reader.read(params);
+
+        const result = await reader.read(params);
+        console.log("result:", result);
+
+        const {
+          data,
+          size: [width, height]
+        } = result;
+
+        display_three_band({ height, width, data: [data[0], data[0], data[0]] });
+      });
+
+      test("umbra", async ({ eq }) => {
+        const georaster = await parseGeoraster(window.location.href + "test-data/umbra_mount_yasur.tiff");
+
+        const reader = await GeoRasterStack.init({
+          debugLevel: 0,
+          flat: true,
+          method: "bilinear",
+          sources: [georaster]
+        });
+
+        const params = {
+          extent: new GeoExtent([128, 100, 1328, 1700], { srs: "simple" }),
           size: [256, 256]
         };
 

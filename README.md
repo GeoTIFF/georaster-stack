@@ -1,40 +1,39 @@
-# georaster-reader
+# georaster-stack
 > Read Stack of GeoSpatial Rasters
 
 ### features
 - Reprojection and Resampling
-- Band Separated Rasters (like Landsat 8)
-- Mixed Projections
+- Band Separated Rasters
+- Projection Mixing
 - Turbo-Charging Reprojection
 - Web Workers
 - Simple SRS (inspired by [CRS.Simple](https://leafletjs.com/examples/crs-simple/crs-simple.html))
+- Various Resampling Methods
 
 ### Known Limitations
-- Only works in the Browser
+- Currently only works in the Browser
 
 ### install
 ```
-npm install georaster-reader
+npm install georaster-stack
 ```
 
 ### basic usage
 ```js
 import { GeoExtent } from "geo-extent";
-import { GeoRasterReader } from "georaster-reader/web";
+import { GeoRasterStack } from "georaster-stack/web";
 
-import parseGeoRaster from "georaster";
-
-const reader = new GeoRasterReader({
+const stack = await GeoRasterStack.init({
   // multiple sources
   // they can even be in different projections!
   sources: [
-     await parseGeoraster("https://example.org/red.tiff"),
-     await parseGeoraster("https://example.org/green.tiff")
-     await parseGeoraster("https://example.org/blue.tiff")
+    "https://example.org/red.tiff",
+    "https://example.org/green.tiff",
+    "https://example.org/blue.tiff"
   ]
 });
 
-const result = await reader.read({
+const result = await stack.read({
   // instance of GeoExtent (https://www.npmjs.com/package/geo-extent)
   // an extent is a bbox with a spatial reference system
   extent: new GeoExtent([-122.49755859375, 38.8520508, -120.06958007812499, 40.697299008636755], { srs: 4326 }),
@@ -63,23 +62,24 @@ const result = await reader.read({
 ### advanced usage
 #### optional properties
 ```js
-const reader = new GeoRasterReader({
+const stack = await GeoRasterStack.init({
   sources: [...],
 
   // optional properties
-  debugLevel,
+  debug_level,
   flat: true, // flatten all the georaster results when reading by one level, so they appear as if they came from the same source
-  method: "near-vectorize", // default resampling method via https://github.com/danieljdufour/geowarp
+  method: "near-vectorize", // resampling method via https://github.com/danieljdufour/geowarp
   turbo: true // apply experimential projection turbo charging via https://github.com/DanielJDufour/proj-turbo
 });
 ```
 
 ### simple projection
 If you want to read using pixel coordinates, pass in an extent with srs set to "simple".
-Inspired by Leaflet's Simple CRS, "simple" srs is when the bottom left corner of the image is [0, 0)]
+Inspired by Leaflet's Simple CRS, "simple" srs is when the bottom left corner of the image is [0, 0]
 and the top-right of the image is [image_width, image_height].
 ```js
-await reader.read({
+await stack.read({
   extent: new GeoExtent([512, 256, 768, 512], { srs: "simple" }),
+  size: [512, 512]
 });
 ```

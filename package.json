@@ -1,32 +1,33 @@
 {
-  "name": "georaster-reader",
+  "name": "georaster-stack",
   "version": "0.2.0",
-  "description": "Read GeoSpatial Raster Data",
-  "main": "./index.js",
+  "description": "Read Stack of GeoSpatial Raster Data",
+  "main": "./web/index.js",
   "files": [
-    "index.js",
+    "core/index.js",
     "web/index.js"
   ],
   "scripts": {
     "build+watch": "npx esbuild ./web/index.js --bundle --outdir=dist --watch",
     "clean": "npx rimraf dist",
     "dev": "npx concurrently \"npm run build+watch\" \"npm run serve\"",
-    "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write *.js *.html",
+    "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write core/*.js web/*.js *.html",
     "serve": "npx srvd --debug --wait=inf",
     "setup": "cd test-data && ./setup.sh",
     "test": "echo 'no automated tests'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GeoTIFF/georaster-reader.git"
+    "url": "git+https://github.com/GeoTIFF/georaster-stack.git"
   },
   "author": "Daniel J. Dufour",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/GeoTIFF/georaster-reader/issues"
+    "url": "https://github.com/GeoTIFF/georaster-stack/issues"
   },
-  "homepage": "https://github.com/GeoTIFF/georaster-reader#readme",
+  "homepage": "https://github.com/GeoTIFF/georaster-stack#readme",
   "dependencies": {
+    "georaster": "^1.6.0",
     "geotiff-tile": "^0.18.3",
     "geotiff-tile-web-worker": "^0.8.1",
     "proj4-fully-loaded": "^0.2.0"
