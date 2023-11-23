@@ -9,7 +9,10 @@ const range = ct => new Array(ct).fill(0).map((_, i) => i);
 // https://dev.to/somedood/the-proper-way-to-write-async-constructors-in-javascript-1o8c
 
 class GeoRasterStack {
-  constructor({ create_worker, debug_level, flat = false, georasters, method, turbo }) {
+  constructor({ cache = true, cache_size = 100, create_worker, debug_level, flat = false, georasters, method, turbo }) {
+    this.cache = [];
+    this.cache_size = cache_size;
+    this.use_cache = cache || false;
     this.debug_level = debug_level;
     this.flat = flat;
     this.georasters = georasters;
@@ -19,18 +22,20 @@ class GeoRasterStack {
     return this;
   }
 
-  static async init({ create_worker, debug_level, flat = false, method, parse_georaster, sources, turbo }) {
+  static async init({ cache, cache_size, create_worker, debug_level, flat, method, parse_georaster, sources, turbo }) {
     return new GeoRasterStack({
+      cache,
+      cache_size,
       create_worker,
       debug_level,
-      flat: flat || false,
+      flat,
       georasters: await Promise.all(sources.map(src => (typeof src === "string" ? parse_georaster(src) : src))),
       method,
       turbo
     });
   }
 
-  async read({ extent, size }) {
+  async _read({ extent, size }) {
     const startReadRasters = performance.now();
 
     const [width, height] = size;
@@ -126,6 +131,34 @@ class GeoRasterStack {
     const result = this.flat ? valuesByGeoRaster.flat() : valuesByGeoRaster;
     if (this.debug_level >= 1) console.log("[georaster-stack] read rasters took:", performance.now() - startReadRasters, "ms");
     return { data: result, size };
+  }
+
+  async read({ extent, size }) {
+    if (this.use_cache) {
+      const [width, height] = size;
+
+      const key = `bbox=${extent.bbox.join(",")}; srs=${extent.srs}; height=${height}; width=${width}`;
+      if (this.debug_level >= 2) console.log("[georaster-stack] key:", key);
+
+      if (this.cache.length > 0) {
+        const entry = this.cache.find(it => it[0] === key);
+        if (entry) {
+          if (this.debug_level >= 1) console.log(`[georaster-stack] found cache entry "${key}"`);
+          return entry;
+        }
+      }
+
+      const promise = this._read({ extent, size });
+
+      // if at limit, remove first element in cache array
+      if (this.cache.length === this.cache_size) this.cache.shift();
+
+      this.cache.push([key, promise]);
+
+      return promise;
+    } else {
+      return this._read({ extent, size });
+    }
   }
 }
 

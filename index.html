@@ -56,11 +56,9 @@
       }
 
       test("basic", async ({ eq }) => {
-        const georaster = await parseGeoraster(window.location.href + "test-data/wildfires.tiff");
-
         const reader = await GeoRasterStack.init({
           flat: true,
-          sources: [georaster]
+          sources: [window.location.href + "test-data/wildfires.tiff"]
         });
 
         const height = 512;
@@ -228,7 +226,7 @@
         const georaster = await parseGeoraster(window.location.href + "test-data/umbra_mount_yasur.tiff");
 
         const reader = await GeoRasterStack.init({
-          debugLevel: 0,
+          debug_level: 1,
           flat: true,
           method: "bilinear",
           sources: [georaster]
@@ -241,8 +239,15 @@
 
         window.rerun = async () => await reader.read(params);
 
+        const start_read = performance.now();
         const result = await reader.read(params);
+        console.log("read took " + Math.round(performance.now() - start_read) + "ms");
         console.log("result:", result);
+
+        // triggering second read, should read promise from cache
+        const start_reread = performance.now();
+        await reader.read(params);
+        console.log("reread took " + Math.round(performance.now() - start_reread) + "ms");
 
         const {
           data,
@@ -250,6 +255,10 @@
         } = result;
 
         display_three_band({ height, width, data: [data[0], data[0], data[0]] });
+
+        const start_reread2 = performance.now();
+        await reader.read(params);
+        console.log("second reread took " + Math.round(performance.now() - start_reread2) + "ms");
       });
     </script>
   </body>
