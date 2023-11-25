@@ -117,6 +117,10 @@ class GeoRasterStack {
           const createTileParams = { ...baseReadTileParams, url: georaster._url, debug_level: 4 };
           if (this.debug_level >= 1) console.log("[georaster-stack] calling createTile with:", createTileParams);
           const created = await tileWorker.createTile(createTileParams);
+          if (created === undefined) {
+            console.error("[georaster-stack] failed to create tile with the following params:\n" + JSON.stringify(createTileParams));
+            throw new Error("[georaster-stack] failed to create tile");
+          }
           return created.tile;
         } else if (georaster._geotiff) {
           return readTile({ ...baseReadTileParams, geotiff: georaster._geotiff }).then(({ tile }) => tile);
