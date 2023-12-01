@@ -1,6 +1,6 @@
 {
   "name": "georaster-stack",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Read Stack of GeoSpatial Raster Data",
   "main": "./web/index.js",
   "files": [
