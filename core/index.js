@@ -148,7 +148,7 @@ class GeoRasterStack {
         const entry = this.cache.find(it => it[0] === key);
         if (entry) {
           if (this.debug_level >= 1) console.log(`[georaster-stack] found cache entry "${key}"`);
-          return entry;
+          return entry[1];
         }
       }
 

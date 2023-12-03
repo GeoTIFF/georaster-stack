@@ -4,7 +4,7 @@
     <script src="https://unpkg.com/flug"></script>
     <script src="http://unpkg.com/geo-extent"></script>
     <script src="https://unpkg.com/georaster"></script>
-    <script src="./dist/index.js"></script>
+    <script src="./dist/georaster-stack.js"></script>
   </head>
   <body>
     <script>
@@ -13,6 +13,7 @@
           // TEST_NAME: "diff projections + ab"
           // TEST_NAME: "landsat stack",
           // TEST_NAME: "umbra",
+          // TEST_NAME: "simple low-res",
           TEST_TIMED: true
         }
       };
@@ -176,9 +177,11 @@
           sources: [georaster]
         });
 
+        const size = [256, 256];
+
         const params = {
           extent: new GeoExtent([128, 656, 144, 672], { srs: "simple" }),
-          size: [256, 256]
+          size
         };
 
         window.rerun = async () => await reader.read(params);
@@ -192,6 +195,9 @@
         } = result;
 
         display_three_band({ height, width, data: [data[0], data[0], data[0]] });
+
+        const reread = await reader.read(params);
+        eq(reread, { data, size });
       });
 
       test("simple high-res", async ({ eq }) => {

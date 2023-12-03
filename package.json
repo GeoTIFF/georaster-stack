@@ -12,7 +12,7 @@
   "unpkg": "./dist/georaster-stack.min.js",
   "scripts": {
     "build": "npx esbuild ./web/index.js --bundle --outfile=./dist/georaster-stack.min.js --sourcemap",
-    "build+watch": "npx esbuild ./web/index.js --bundle --outdir=dist --watch",
+    "build+watch": "npx esbuild ./web/index.js --bundle --outfile=./dist/georaster-stack.js --watch",
     "clean": "npx rimraf dist",
     "dev": "npx concurrently \"npm run build+watch\" \"npm run serve\"",
     "format": "npx prettier --arrow-parens=avoid --print-width=200 --trailing-comma=none --write core/*.js web/*.js *.html",
