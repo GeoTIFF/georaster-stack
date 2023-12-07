@@ -44,12 +44,14 @@ class GeoRasterStack {
 
     const resample_method = this.defaultMethod || "near-vectorize";
 
+    const sub_debug_level = Math.max((this.debug_level || 3) - 3, 0);
+
     const promises = this.georasters.map(async georaster => {
       // old-school in-memory georaster from an ArrayBuffer or simple object
       if (georaster.values) {
         if (extent.srs === "simple") {
           return geowarp({
-            debug_level: Math.max((this.debug_level || 3) - 3, 0),
+            debug_level: sub_debug_level,
             in_data: georaster.values,
             in_bbox: [0, 0, georaster.width, georaster.height],
             in_layout: "[band][row][column]",
@@ -68,7 +70,7 @@ class GeoRasterStack {
           const { forward, inverse } = proj4fullyloaded("EPSG:" + georaster.projection, extent.srs);
 
           return geowarp({
-            debug_level: Math.max((this.debug_level || 3) - 3, 0),
+            debug_level: sub_debug_level,
             forward,
             inverse,
             in_data: georaster.values,
@@ -92,7 +94,7 @@ class GeoRasterStack {
         const baseReadTileParams = {
           bbox: extent.bbox,
           bbox_srs: extent.srs,
-          debug_level: 5,
+          debug_level: sub_debug_level,
           method: resample_method,
           round: false,
           tile_array_types: out_array_types,
@@ -100,7 +102,7 @@ class GeoRasterStack {
           tile_layout: "[band][row][column]",
           tile_srs: extent.srs,
           tile_width: width,
-          timed: true,
+          timed: sub_debug_level >= 1,
           use_overview: true,
           turbo: this.turbo
         };
@@ -114,7 +116,7 @@ class GeoRasterStack {
         if (this.debug_level >= 2) console.log("[georaster-stack] baseReadTileParams:", baseReadTileParams);
         if (georaster._url) {
           const tileWorker = await chooseAtRandom(this.tileWorkers);
-          const createTileParams = { ...baseReadTileParams, url: georaster._url, debug_level: 4 };
+          const createTileParams = { ...baseReadTileParams, url: georaster._url };
           if (this.debug_level >= 1) console.log("[georaster-stack] calling createTile with:", createTileParams);
           const created = await tileWorker.createTile(createTileParams);
           if (created === undefined) {

@@ -145,7 +145,7 @@
         ];
 
         const reader = await GeoRasterStack.init({
-          debugLevel: 0,
+          debug_level: 0,
           flat: true,
           sources: await Promise.all(urls.map(url => parseGeoraster(url)))
         });
@@ -172,7 +172,7 @@
         console.log("georaster:", georaster);
 
         const reader = await GeoRasterStack.init({
-          debugLevel: 0,
+          debug_level: 0,
           flat: true,
           sources: [georaster]
         });
@@ -205,7 +205,7 @@
         console.log("georaster:", georaster);
 
         const reader = await GeoRasterStack.init({
-          debugLevel: 0,
+          debug_level: 0,
           flat: true,
           sources: [georaster]
         });
@@ -232,7 +232,7 @@
         const georaster = await parseGeoraster(window.location.href + "test-data/umbra_mount_yasur.tiff");
 
         const reader = await GeoRasterStack.init({
-          debug_level: 1,
+          debug_level: 0,
           flat: true,
           method: "bilinear",
           sources: [georaster]
