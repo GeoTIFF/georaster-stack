@@ -32,8 +32,8 @@
   "homepage": "https://github.com/GeoTIFF/georaster-stack#readme",
   "dependencies": {
     "georaster": "^1.6.0",
-    "geotiff-tile": "^0.18.3",
-    "geotiff-tile-web-worker": "^0.9.1",
+    "geotiff-tile": "^0.19.1",
+    "geotiff-tile-web-worker": "^0.10.0",
     "proj4-fully-loaded": "^0.2.0"
   },
   "devDependencies": {
